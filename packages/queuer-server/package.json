@@ -1,0 +1,17 @@
+{
+  "name": "museik",
+  "version": "0.0.1",
+  "description": "An office music player",
+  "main": "index.js",
+  "author": "Paul Esson",
+  "license": "MIT",
+  "dependencies": {
+    "dbus-next": "^0.8.1",
+    "express": "^4.17.1",
+    "node-spotify-api": "^1.1.1",
+    "request": "^2.88.0",
+    "rxjs": "^6.5.4",
+    "sqlite3": "^4.1.1",
+    "ws": "^7.2.1"
+  }
+}
