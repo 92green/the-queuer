@@ -15,12 +15,8 @@ function CurrentTrack() {
   if(currentTrack){
     return (
       <div className="currentTrack">
-        <div>
-          <Img  src={currentTrack.artUrl}/>
-        </div>
-        <div>{currentTrack.artist.join(' & ')}</div>
-        <div>{currentTrack.title}</div>
-        <div>{currentTrack.album}</div>
+        <Img  src={currentTrack.artUrl}  loader={<Loader/>} className="Album-art"/>
+        <div>{currentTrack.artist.join(' & ')} - {currentTrack.title} - {currentTrack.album}</div>
       </div>
     )
   } else  {
@@ -33,7 +29,7 @@ function AlbumDisplay({album}){
   let [image] = album.images;
   return (
     <div className="Album-display">
-      <Img src={album.images.map(ii => ii.url)} decode={false} loader={<Loader/>}/>
+      <Img src={album.images.map(ii => ii.url)} decode={false} loader={<Loader/>}  className="Album-art"/>
       <div className="Album-artists">{album.artists.map(({name}) => name).join(' & ')}</div>
       <div>{album.name}</div>  
       {/* <div>{album.release_date}</div> */}
