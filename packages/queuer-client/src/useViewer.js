@@ -12,7 +12,7 @@ if(!storedViewer){
     window.localStorage.setItem('viewer', storedViewer);
 }
 
-export default function useCurrentTrack() {
+export default function useViewer() {
     const [viewer, setViewer] = useState(null);
     setViewer(JSON.parse(storedViewer))
     return {viewer};

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {subscribeToTrackChange} from './api'
-
+let  obs = subscribeToTrackChange();
 export default function useCurrentTrack() {
     const [currentTrack, setCurrrentTrack] = useState(null);
-    subscribeToTrackChange().subscribe(ii => {
-        setCurrrentTrack(ii.data);
-    });
+    useEffect(() => {
+        obs.subscribe(ii => {
+            setCurrrentTrack(ii.data);
+        });
+    }, [])
     return {currentTrack};
 }

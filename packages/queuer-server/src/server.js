@@ -5,6 +5,12 @@ const {share} = require('rxjs/operators')
 
 const userPlaylist = new Map();
 const playlistSub = new Subject().pipe(share());
+var currentSong = {};
+
+currentTrackObs.subscribe(ii => {
+    delete(ii.length);
+    currentSong = ii;
+})
 
 // Add items into the playlist 
 playlistSub.subscribe(({userId, item}) => {
@@ -41,7 +47,11 @@ wss.on('connection', (ws) => {
 
 
 function subscribeCurrentTrack(ws, {id}){
-    console.log('subscribeCurrentTrack')
+    ws.send(JSON.stringify({
+        type: 'SUBSCRIBE_CURRENT_TRACK_RESPONSE',
+        id,
+        data: currentSong
+    }))
     currentTrackObs.subscribe((ii) => {
         delete(ii.length)
         return ws.send(JSON.stringify({

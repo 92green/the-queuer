@@ -1,6 +1,12 @@
-/* .App {
-  text-align: center;
-} */
+.App {
+  --color1: rgba(232, 197, 71, 1);
+  --color2: rgba(41, 115, 115, 1);
+  --color3: rgba(18, 22, 25, 1);
+  --color4: rgba(45, 71, 57, 1);
+  --color5: rgba(9, 129, 74, 1);
+  --hero: var(--color1);
+  --fg: #eee;
+}
 
 /* .App-logo {
   height: 40vmin;
@@ -15,21 +21,13 @@
 
 .App-header {
   background-color: var(--fg);
-  min-height: 100vh;
+  min-height: 10vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  justify-content: center; 
   font-size: calc(10px + 2vmin);
   color: var(--color3);
-  --hero: var(--color1);
 
-  --color1: rgba(232, 197, 71, 1);
-  --color2: rgba(41, 115, 115, 1);
-  --color3: rgba(18, 22, 25, 1);
-  --color4: rgba(45, 71, 57, 1);
-  --color5: rgba(9, 129, 74, 1);
-  --fg: #eee;
 }
 
 .App-link {
@@ -49,9 +47,9 @@
   height: 100%;
   font-size: 0.6em;
   display: grid;
-  padding: 0.25em;
+  /* padding: 0.25em; */
   border-top: 1px black;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   height: 4em;
   justify-items: center;
   align-items: center;
@@ -74,8 +72,11 @@ button {
 input{
   border: none;
   background-color: var(--hero);
-  padding: 0.6rem 1.2rem;
+  padding:  0.5rem 2%;
+  width: 98%
+  /* margin: 1em; */
 }
+
 
 .loader {
   /* width: 120px; */
@@ -89,6 +90,28 @@ input{
   width: 15rem;
   height: 18rem;
   margin: 0.5rem;
+}
+
+.currentTrack{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  /* grid-template-columns: 1fr 1fr 1fr 1fr; */
+  /* grid-template-columns: auto; */
+  justify-items: center;
+  text-align: center;
+  padding: 0.5em 0.1em;
+  font-size: 0.5em;
+
+}
+.currentTrack div  {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: center;
+  /* padding: 0.5em; */
+}
+.currentTrack img {
+  height: 5em;
 }
 
 @keyframes spin {

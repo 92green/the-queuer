@@ -14,10 +14,12 @@ function CurrentTrack() {
   const {currentTrack} = useCurrentTrack()
   if(currentTrack){
     return (
-      <div>
-        <Img  src={currentTrack.artUrl}/>
-        <div>{currentTrack.title}</div>
+      <div className="currentTrack">
+        <div>
+          <Img  src={currentTrack.artUrl}/>
+        </div>
         <div>{currentTrack.artist.join(' & ')}</div>
+        <div>{currentTrack.title}</div>
         <div>{currentTrack.album}</div>
       </div>
     )
@@ -62,8 +64,8 @@ function App() {
     <div className="App">
       <header className="App-header">
         <CurrentTrack/>
-        <AlbumSearch/>
       </header>
+      <AlbumSearch/>
     </div>
   );
 
