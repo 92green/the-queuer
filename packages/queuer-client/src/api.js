@@ -1,6 +1,6 @@
 import {webSocket} from "rxjs/webSocket";
 import {defer} from 'rxjs'
-import {share, filter, first, tap, flatMap} from 'rxjs/operators';
+import {share, filter, first, tap, map, flatMap} from 'rxjs/operators';
 import uuidv4 from 'uuid/v4'
 import {Subject} from 'rxjs'
 import {distinctUntilChanged, debounceTime} from 'rxjs/operators'
@@ -41,7 +41,8 @@ export function SearchAlbumSub(){
                 filter(ii => ii.id === id),
                 map(ii => ii.data)
             )
-        })
+        }),
+        share(),
     );
 } 
 

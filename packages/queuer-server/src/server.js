@@ -1,5 +1,19 @@
 const WebSocket = require('ws');
 const {currentTrackObs, search} = require ('./spotify')
+const {Subject} = require('rxjs')
+const {share} = require('rxjs/operators')
+
+const userPlaylist = new Map();
+const playlistSub = new Subject().pipe(share());
+
+// Add items into the playlist 
+playlistSub.subscribe(({userId, item}) => {
+    if(!userPlaylist.has(userId)){
+        userPlaylist.set(userId, [])
+    }
+    userPlaylist.get(userId).push(item)
+})
+
 const wss = new WebSocket.Server({
     port: 8080
 });
@@ -25,6 +39,7 @@ wss.on('connection', (ws) => {
     });
 });
 
+
 function subscribeCurrentTrack(ws, {id}){
     console.log('subscribeCurrentTrack')
     currentTrackObs.subscribe((ii) => {
@@ -35,6 +50,29 @@ function subscribeCurrentTrack(ws, {id}){
             data: ii
         }))
     })
+}
+
+async function addToPlaylist(ws, {id, userId}){
+    playlistSub.next({userId, item});
+}
+
+function subscribeUserPlaylist(ws, {id, userId}){
+    if(userPlaylist.has(userId)){
+        ws.send(JSON.stringify({
+            type: 'USER_PLAYLIST_RESPONSE',
+            id,
+            data: userPlaylist.get(userId)
+        }))
+    }
+    playlistSub
+        .pipe(filter(ii => ii.userId === userId))
+        .subscribe(({item}) => {
+            ws.send(JSON.stringify({
+                type: 'USER_PLAYLIST_UPDATE',
+                id,
+                data: item
+            }))
+        })
 }
 
 async function searchAlbum(ws, {id, query}){

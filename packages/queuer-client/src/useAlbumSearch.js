@@ -8,8 +8,8 @@ export default function useAlbumSearch() {
     useEffect(() => {
         searchAlbumSub.next(searchTerm);
     })
-    searchAlbumSub.subscribe(ii => {
-        setSearchResults(ii);
+    searchAlbumSub.subscribe(({albums}) => {
+        setSearchResults(albums.items);
     })
     
     return {setSearchTerm, searchResults, searchTerm};
