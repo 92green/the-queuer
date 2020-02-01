@@ -61,7 +61,10 @@ function App() {
       <header className="App-header">
         <CurrentTrack/>
       </header>
-      <AlbumSearch/>
+      <div className="content"> 
+        <AlbumSearch />
+      </div>
+      
     </div>
   );
 

@@ -20,6 +20,9 @@ async function openUri (spotifyUri) {
 
 async function search({type, query}){
     console.log('SEACHING', query)
+    if (!query || query === "" || !type){
+        return []
+    }
     return spotify.search({type, query})
 }
 

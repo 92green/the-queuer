@@ -18,8 +18,20 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+body{
+  --color1: rgba(232, 197, 71, 1);
+  --color2: rgba(41, 115, 115, 1);
+  --color3: rgba(18, 22, 25, 1);
+  --color4: rgba(45, 71, 57, 1);
+  --color5: rgba(9, 129, 74, 1);
+  --hero: var(--color1);
+  --fg: #eee;
+  background-color: var(--color3);
+  color: var(--fg);
+}
 
 .App-header {
+  width: 100%;
   background-color: var(--fg);
   min-height: 10vh;
   display: flex;
@@ -61,6 +73,7 @@
   border-style: solid;
   height: 10rem;
   width: 10rem;
+  padding: 0.1rem;
 }
 .Album-grid img {
   /* padding: 1rem; */
@@ -92,11 +105,11 @@ input{
 }
 
 .Album-display {
-  background-color: #fff;
   text-align: center;
   width: 15rem;
   height: 18rem;
-  margin: 0.5rem;
+  padding: 1em;
+  
 }
 
 .currentTrack{
@@ -108,6 +121,7 @@ input{
   text-align: left;
   padding: 0.5em 0.1em;
   font-size: 0.5em;
+  padding: 1em;
 
 }
 .currentTrack div  {
