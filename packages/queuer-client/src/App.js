@@ -28,12 +28,10 @@ function CurrentTrack() {
 }
 
 function AlbumDisplay({album}){
-  // let {addToViewerQueue} = useViewerQueue();
-  let viewer = useViewer()
+  let {viewer} = useViewer()
   let [disabled, setDisabled] = useState(false)
   const onAdd = () => {
-    addToUserQueue({userId: viewer.id, item: album})
-    // addToViewerQueue({item: album});
+    addToUserQueue({userId: viewer.id, item: album});
     setDisabled(true);
   }
   return (
