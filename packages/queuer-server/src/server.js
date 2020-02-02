@@ -17,8 +17,8 @@ queueFinished.subscribe(ii => {
     let users = Array.from(userQueue.keys());
     if(users.length > 0){
         let currentUser = users[mapItr % users.length];
-        console.log(currentUser, mapItr, users )
         let selectedUri = userQueue.get(currentUser).shift();
+        mapItr++;
         openUri(selectedUri.uri)
     } else {
         console.log('Nothing to play')
