@@ -36,21 +36,18 @@ function CurrentTrack() {
 
 function AlbumDisplay({album, isAdded = false}){
   let {viewer} = useViewer()
-  let [added, setAdded] = useState(isAdded)
   const onAdd = () => {
     addToUserQueue({userId: viewer.id, item: album});
-    setAdded(true);
   }
   const onRemove = () => {
     removeFromUserQueue({userId: viewer.id, item: album});
-    setAdded(false);
   }
   return (
     <div className="Album-display" key={album.id}>
       <Img src={album.images.map(ii => ii.url)} decode={false} loader={<Loader/>}  className="Album-art"/>
       <div className="Album-artists">{album.artists.map(({name}) => name).join(' & ')}</div>
       <div>{album.name}</div>
-      {added ? <button type="button" onClick={onRemove} className="btn-red">Remove</button> : <button type="button" onClick={onAdd}>Add</button>}
+      {isAdded ? <button type="button" onClick={onRemove} className="btn-red">Remove</button> : <button type="button" onClick={onAdd}>Add</button>}
     </div>
   );
 }
@@ -69,9 +66,12 @@ function UserQueue() {
 
 function AlbumSearch() {
   const {setSearchTerm, searchResults, searchTerm} = useAlbumSearch();
+  const {viewer} = useViewer();
+  let {userQueue} = useUserQueue({userId: viewer.id});
   const onQueryChange = (event) => {
     setSearchTerm(event.target.value)
   }
+  console.log(userQueue.map(jj => jj.id))
   return (
     <div>
       <input type="text" value={searchTerm} onChange={onQueryChange} placeholder="Search Albums"/>
@@ -79,7 +79,7 @@ function AlbumSearch() {
       {
         searchResults && searchResults.length > 0 ?
         <div className="Album-grid">
-          {searchResults.map(ii => <AlbumDisplay album={ii}/>)}
+          {searchResults.map(ii => <AlbumDisplay album={ii} isAdded={userQueue.map(jj => jj.id).includes(ii.id)}/>)}
         </div>
         :
         <div></div>
