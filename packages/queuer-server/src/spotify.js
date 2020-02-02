@@ -1,11 +1,11 @@
 const {Subject} = require('rxjs');
-const {share, map, distinctUntilChanged} = require('rxjs/operators');
+const {share, map, distinctUntilChanged, filter} = require('rxjs/operators');
 const Spotify = require('node-spotify-api');
 const dbus = require('dbus-next');
 const bus = dbus.sessionBus();
 const Variant = dbus.Variant;
 const metadataObs = new Subject();
-
+const playbackStatusObs = new Subject();
 var spotify = new Spotify({
     id: process.env.SPOTIFY_CLIENT_ID,
     secret: process.env.SPOTIFY_CLIENT_SECRET
@@ -44,13 +44,16 @@ let currentTrackObs = metadataObs
         distinctUntilChanged((ii, jj) => ii.trackid === jj.trackid),
         share()
     )
-    //.subscribe((ii) => console.log('got signal', ii))
-    
 
+let queueFinished = playbackStatusObs
+    .pipe(
+        filter(ii => ii.value === 'Paused')
+    );
 
 
 async function listen(){
     let obj = await bus.getProxyObject('org.mpris.MediaPlayer2.spotify', '/org/mpris/MediaPlayer2');
+    console.log(obj)
     let properties = obj.getInterface('org.freedesktop.DBus.Properties');
     let metadata = await properties.Get('org.mpris.MediaPlayer2.Player', 'Metadata');
     metadataObs.next(metadata);
@@ -58,12 +61,14 @@ async function listen(){
         if(changed.Metadata)
         {
             metadataObs.next(changed.Metadata);
+            playbackStatusObs.next(changed.PlaybackStatus)
         }
     });
 }
 listen()
 
 module.exports = {
+    queueFinished,
     currentTrackObs,
     openUri,
     search

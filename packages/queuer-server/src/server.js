@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const {currentTrackObs, search} = require ('./spotify')
+const {currentTrackObs, search, queueFinished, openUri} = require ('./spotify')
 const {Subject} = require('rxjs')
 const {share, filter} = require('rxjs/operators')
 
@@ -10,6 +10,19 @@ var currentSong = {};
 currentTrackObs.subscribe(ii => {
     delete(ii.length);
     currentSong = ii;
+})
+
+let mapItr = 0;
+queueFinished.subscribe(ii => {
+    let users = Array.from(userQueue.keys());
+    if(users.length > 0){
+        let currentUser = users[mapItr % users.length];
+        console.log(currentUser, mapItr, users )
+        let selectedUri = userQueue.get(currentUser).shift();
+        openUri(selectedUri.uri)
+    } else {
+        console.log('Nothing to play')
+    }
 })
 
 // Add items into the playlist 

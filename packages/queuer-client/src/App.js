@@ -51,7 +51,7 @@ function UserQueue() {
   let {userQueue} = useUserQueue({userId: viewer.id});
   // console.log('viewer queue', viewerQueue)
   return <div>
-    <h2>Enqueued</h2>
+    <h2>My Queue</h2>
     <div className="Album-grid">
         {userQueue.map(ii => <AlbumDisplay album={ii}/>)}
     </div>
