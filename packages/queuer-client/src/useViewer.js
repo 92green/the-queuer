@@ -6,8 +6,8 @@ import uuid from 'uuid/v4';
 
 export default function useViewer() {
     const [viewer, setViewer] = useState({});
-    let storedViewer = window.localStorage.getItem('viewer')
     useEffect(() => {
+        let storedViewer = window.localStorage.getItem('viewer')
         if(!storedViewer){
             storedViewer = JSON.stringify({
                 id: uuid()
@@ -15,6 +15,6 @@ export default function useViewer() {
             window.localStorage.setItem('viewer', storedViewer);
         }
         setViewer(JSON.parse(storedViewer))
-    }, [storedViewer])
+    }, [])
     return {viewer};
 }

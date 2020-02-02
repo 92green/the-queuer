@@ -2,10 +2,12 @@ import React from 'react';
 import logo from './logo.svg';
 import useCurrentTrack from './useCurrentTrack'
 import useAlbumSearch from './useAlbumSearch'
+import useViewer from './useViewer'; 
 import {useState} from 'react';
 import Img from 'react-image'
 import './App.css';
-import useViewerQueue from './useViewerQueue'
+import useUserQueue from './useUserQueue'
+import {addToUserQueue} from './api' 
 function Loader(){
   // return <img src="/queuer-isometric.svg"/>
   return <img src="/record-loader.svg" className="loader"/>
@@ -26,20 +28,34 @@ function CurrentTrack() {
 }
 
 function AlbumDisplay({album}){
-  let {addToViewerQueue} = useViewerQueue();
+  // let {addToViewerQueue} = useViewerQueue();
+  let viewer = useViewer()
   let [disabled, setDisabled] = useState(false)
   const onAdd = () => {
-    addToViewerQueue({item: album});
+    addToUserQueue({userId: viewer.id, item: album})
+    // addToViewerQueue({item: album});
     setDisabled(true);
   }
   return (
-    <div className="Album-display">
+    <div className="Album-display" key={album.id}>
       <Img src={album.images.map(ii => ii.url)} decode={false} loader={<Loader/>}  className="Album-art"/>
       <div className="Album-artists">{album.artists.map(({name}) => name).join(' & ')}</div>
       <div>{album.name}</div>
       <button type="button" onClick={onAdd} disabled={disabled}>Add</button>   
     </div>
   );
+}
+
+function UserQueue() {
+  const {viewer} = useViewer();
+  let {userQueue} = useUserQueue({userId: viewer.id});
+  // console.log('viewer queue', viewerQueue)
+  return <div>
+    <h2>Enqueued</h2>
+    <div className="Album-grid">
+        {userQueue.map(ii => <AlbumDisplay album={ii}/>)}
+    </div>
+  </div>
 }
 
 function AlbumSearch() {
@@ -72,6 +88,7 @@ function App() {
       </header>
       <div className="content"> 
         <AlbumSearch />
+        <UserQueue/>
       </div>
       
     </div>

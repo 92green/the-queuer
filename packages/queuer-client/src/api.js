@@ -19,7 +19,8 @@ export function subscribeToUserQueue({userId}){
                 userId
             })
         }),
-        filter(ii => ii.id === id)
+        filter(ii => ii.id === id),
+        tap(ii => console.log(ii))
     )
 }
 

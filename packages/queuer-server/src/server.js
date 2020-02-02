@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const {currentTrackObs, search} = require ('./spotify')
 const {Subject} = require('rxjs')
-const {share} = require('rxjs/operators')
+const {share, filter} = require('rxjs/operators')
 
 const userQueue = new Map();
 const playlistSub = new Subject().pipe(share());

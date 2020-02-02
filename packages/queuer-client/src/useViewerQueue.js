@@ -4,6 +4,10 @@ import useUserQueue from './useUserQueue';
 import {addToUserQueue} from './api' 
 export default function useViewerQueue(){
     const {viewer} = useViewer();
-    const {userQueue} = useUserQueue({userId: viewer.id})
-    return {viewerQueue: userQueue, addToViewerQueue: ({item}) => addToUserQueue({userId: viewer.id, item}) } 
+    let viewerQueue;
+    useEffect(() =>{
+        const {userQueue} = useUserQueue({userId: viewer.id})
+        viewerQueue = userQueue;
+    })
+    return {viewerQueue, addToViewerQueue: ({item}) => addToUserQueue({userId: viewer.id, item}) } 
 }
