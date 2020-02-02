@@ -3,6 +3,8 @@ const {currentTrackObs, search, queueFinished, openUri} = require ('./spotify')
 const {Subject} = require('rxjs')
 const {share, filter} = require('rxjs/operators')
 
+
+
 const userQueue = new Map();
 const playlistSub = new Subject().pipe(share());
 var currentSong = {};

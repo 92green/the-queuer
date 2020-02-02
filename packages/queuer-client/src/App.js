@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import useCurrentTrack from './useCurrentTrack'
 import useAlbumSearch from './useAlbumSearch'
 import useViewer from './useViewer'; 
@@ -8,8 +7,16 @@ import Img from 'react-image'
 import './App.css';
 import useUserQueue from './useUserQueue'
 import {addToUserQueue} from './api' 
+
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+
 function Loader(){
-  // return <img src="/queuer-isometric.svg"/>
   return <img src="/record-loader.svg" className="loader"/>
 }
 
@@ -71,7 +78,7 @@ function AlbumSearch() {
           {searchResults.map(ii => <AlbumDisplay album={ii}/>)}
         </div>
         :
-        <div>Type in the search box to find an album</div>
+        <div></div>
       }
     </div>
   )
@@ -81,14 +88,25 @@ function App() {
   const {currentTrack} = useCurrentTrack()
   return (
     <div className="App">
-      <header className="App-header">
-        <CurrentTrack/>
-      </header>
-      <div className="content"> 
-        <AlbumSearch />
-        <UserQueue/>
-      </div>
-      
+       <Router>
+        <header className="App-header">
+          <CurrentTrack/>
+        </header>
+        <div className="menu">
+          <Link to="/">Queue</Link>
+          <Link to="/search">Search</Link>
+        </div>
+        <div className="content"> 
+          <Switch>
+            <Route path="/search">
+              <AlbumSearch />
+            </Route>
+            <Route path="/">
+              <UserQueue/>
+            </Route>
+          </Switch>
+        </div>
+      </Router>
     </div>
   );
 

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Rubik&display=swap');
+
 .App {
   --color1: rgba(232, 197, 71, 1);
   --color2: rgba(41, 115, 115, 1);
@@ -19,6 +21,7 @@
   }
 }
 body{
+  font-family: 'Rubik', sans-serif;
   --color1: rgba(232, 197, 71, 1);
   --color2: rgba(41, 115, 115, 1);
   --color3: rgba(18, 22, 25, 1);
@@ -75,9 +78,7 @@ body{
   padding: 0.1rem;
 }
 .Album-grid img {
-  /* padding: 1rem; */
   height: 10rem;
-  /* background: url('loading.png') no-repeat; */
 }
 .Album-artists {
   font-weight: 700;
@@ -122,16 +123,37 @@ input {
   /* grid-template-columns: auto; */
   justify-items: left;
   text-align: left;
-  padding: 0.5em 0.1em;
+  padding: 0.1em 0.25em;
   font-size: 0.8em;
-  padding: 1em;
+  /* padding: 1em; */
   position: absolute;
+  
 }
 .currentTrack div  {
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: scroll 7s linear 0s infinite;
+}
+
+h2 {
+  margin: 0.25em;
+}
+
+.menu {
+  justify-content: center;
+  text-align: left;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+  background-color:#ddd;
+  color: var(--color4);
+  /* border-top: solid 2px var(--color4); */
+  
+}
+
+.menu a {
+  padding: 0.5em;
+  display: inline;
+  /* border-right: solid 2px black; */
 }
 
 .currentTrack img {

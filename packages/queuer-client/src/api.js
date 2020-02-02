@@ -25,6 +25,7 @@ export function subscribeToUserQueue({userId}){
 }
 
 export function addToUserQueue({userId, item}){
+    console.log('USERID', userId)
     const id = uuidv4();
     return subject.next({
         type: 'ADD_USER_QUEUE',
