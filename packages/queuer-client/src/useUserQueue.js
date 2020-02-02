@@ -10,15 +10,20 @@ export default function useUserQueue({userId}){
     useEffect(() => {
         subscribeToUserQueue({userId})
             .subscribe(ii => {
-                if(ii.type === 'USER_QUEUE_RESPONSE'){
-                    queues.set(userId, ii.data)
-                    setUserQueue(queues.get(userId))
+                switch(ii.type){
+                    case 'USER_QUEUE_RESPONSE':
+                        queues.set(userId, ii.data)
+                    break;
+                    case 'USER_QUEUE_UPDATE':
+                        var update = [...queues.get(userId),  ii.data]
+                        queues.set(userId, update);
+                    break;
+                    case 'USER_QUEUE_REMOVE':
+                        var update = queues.get(userId).filter(jj => jj.uri !== ii.data.uri);
+                        queues.set(userId, update);
+                    break;
                 }
-                else if(ii.type === 'USER_QUEUE_UPDATE'){
-                    let update = [...queues.get(userId),  ii.data]
-                    queues.set(userId, update)
-                    setUserQueue(queues.get(userId))
-                }
+                setUserQueue(queues.get(userId));
             })
     }, [userId])
     return {userQueue}

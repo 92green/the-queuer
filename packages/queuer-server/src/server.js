@@ -6,7 +6,7 @@ const {share, filter} = require('rxjs/operators')
 
 
 const userQueue = new Map();
-const playlistSub = new Subject().pipe(share());
+const userQueueSub = new Subject().pipe(share());
 var currentSong = {};
 
 currentTrackObs.subscribe(ii => {
@@ -18,24 +18,41 @@ let mapItr = 0;
 queueFinished.subscribe(ii => {
     let users = Array.from(userQueue.keys());
     if(users.length > 0){
-        let currentUser = users[mapItr % users.length];
-        let selectedUri = userQueue.get(currentUser).shift();
-        if (userQueue.get(currentUser).length === 0){
-            userQueue.delete(currentUser)
-        }
+        let userId = users[mapItr % users.length];
+        let [item] = userQueue.get(userId);
+        userQueueSub.next({
+            userId,
+            action: 'REMOVE',
+            item
+        })
         mapItr++;
-        openUri(selectedUri.uri)
+        openUri(item.uri)
     } else {
         console.log('Nothing to play')
     }
 })
 
 // Add items into the playlist 
-playlistSub.subscribe(({userId, item}) => {
-    if(!userQueue.has(userId)){
-        userQueue.set(userId, [item])
-    } else {
-        userQueue.get(userId).push(item)
+// Currently responsable to manage the data storage of the list.
+userQueueSub.subscribe(({userId, item, action}) => {
+    switch(action) {
+        case 'ADD':
+            if(!userQueue.has(userId)){
+                userQueue.set(userId, [item])
+            } else {
+                userQueue.get(userId).push(item)
+            }
+        break;
+        case 'REMOVE':
+            if(userQueue.has(userId)){
+                let updated = userQueue.get(userId).filter(ii => ii.uri !== item.uri);
+                if(updated.length === 0){
+                    userQueue.delete(userId)
+                } else {
+                    userQueue.set(userId, updated)
+                }
+            }
+        break;
     }
 })
 
@@ -48,7 +65,8 @@ const responders = {
     'SEARCH_TRACK': searchTrack,
     'SEARCH_PLAYLIST': searchPlaylist,
     'SUBSCRIBE_USER_QUEUE': subscribeUserQueue,
-    'ADD_USER_QUEUE': addToUserQueue
+    'ADD_USER_QUEUE': addToUserQueue,
+    'REMOVE_USER_QUEUE': removeFromUserQueue
 }
 
 const SUBSCRIPTION = {
@@ -83,7 +101,19 @@ function subscribeCurrentTrack(ws, {id}){
 }
 
 async function addToUserQueue(ws, {id, userId, item}){
-    playlistSub.next({userId, item});
+    userQueueSub.next({
+        userId, 
+        action: 'ADD',
+        item
+    });
+}
+
+async function removeFromUserQueue(ws, {id, userId, item}){
+    userQueueSub.next({
+        userId,
+        action: 'REMOVE',
+        item
+    })
 }
 
 function subscribeUserQueue(ws, {id, userId}){
@@ -94,14 +124,23 @@ function subscribeUserQueue(ws, {id, userId}){
             data: userQueue.get(userId)
         }))
     }
-    playlistSub
+    userQueueSub
         .pipe(filter(ii => ii.userId === userId))
-        .subscribe(({item}) => {
-            ws.send(JSON.stringify({
-                type: 'USER_QUEUE_UPDATE',
-                id,
-                data: item
-            }))
+        .subscribe(({item, action}) => {
+            if(action === 'ADD'){
+                ws.send(JSON.stringify({
+                    type: 'USER_QUEUE_UPDATE',
+                    id,
+                    data: item
+                }))
+            }
+            if(action === 'REMOVE'){
+                ws.send(JSON.stringify({
+                    type: 'USER_QUEUE_REMOVE',
+                    id,
+                    data: item
+                }))
+            }
         })
 }
 

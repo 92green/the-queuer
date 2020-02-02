@@ -6,7 +6,7 @@ import {useState} from 'react';
 import Img from 'react-image'
 import './App.css';
 import useUserQueue from './useUserQueue'
-import {addToUserQueue} from './api' 
+import {addToUserQueue, removeFromUserQueue} from './api' 
 
 
 import {
@@ -34,19 +34,23 @@ function CurrentTrack() {
   }
 }
 
-function AlbumDisplay({album}){
+function AlbumDisplay({album, isAdded = false}){
   let {viewer} = useViewer()
-  let [disabled, setDisabled] = useState(false)
+  let [added, setAdded] = useState(isAdded)
   const onAdd = () => {
     addToUserQueue({userId: viewer.id, item: album});
-    setDisabled(true);
+    setAdded(true);
+  }
+  const onRemove = () => {
+    removeFromUserQueue({userId: viewer.id, item: album});
+    setAdded(false);
   }
   return (
     <div className="Album-display" key={album.id}>
       <Img src={album.images.map(ii => ii.url)} decode={false} loader={<Loader/>}  className="Album-art"/>
       <div className="Album-artists">{album.artists.map(({name}) => name).join(' & ')}</div>
       <div>{album.name}</div>
-      <button type="button" onClick={onAdd} disabled={disabled}>Add</button>   
+      {added ? <button type="button" onClick={onRemove} className="btn-red">Remove</button> : <button type="button" onClick={onAdd}>Add</button>}
     </div>
   );
 }
@@ -58,7 +62,7 @@ function UserQueue() {
   return <div>
     <h2>My Queue</h2>
     <div className="Album-grid">
-        {userQueue.map(ii => <AlbumDisplay album={ii}/>)}
+        {userQueue.map(ii => <AlbumDisplay album={ii} isAdded={true}/>)}
     </div>
   </div>
 }

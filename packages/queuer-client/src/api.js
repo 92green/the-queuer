@@ -25,7 +25,6 @@ export function subscribeToUserQueue({userId}){
 }
 
 export function addToUserQueue({userId, item}){
-    console.log('USERID', userId)
     const id = uuidv4();
     return subject.next({
         type: 'ADD_USER_QUEUE',
@@ -34,6 +33,17 @@ export function addToUserQueue({userId, item}){
         item
     });
 }
+
+export function removeFromUserQueue({userId, item}){
+    const id = uuidv4();
+    return subject.next({
+        type: 'REMOVE_USER_QUEUE',
+        id,
+        userId,
+        item
+    });
+}
+
 
 export function subscribeToTrackChange(){
     const id = uuidv4();
