@@ -71,7 +71,7 @@ function AlbumSearch() {
           {searchResults.map(ii => <AlbumDisplay album={ii}/>)}
         </div>
         :
-        <div>Type in the serach box to find an album</div>
+        <div>Type in the search box to find an album</div>
       }
     </div>
   )

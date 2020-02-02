@@ -19,7 +19,6 @@ async function openUri (spotifyUri) {
 }
 
 async function search({type, query}){
-    console.log('SEACHING', query)
     if (!query || query === "" || !type){
         return []
     }
@@ -47,13 +46,13 @@ let currentTrackObs = metadataObs
 
 let queueFinished = playbackStatusObs
     .pipe(
+        distinctUntilChanged((ii, jj) => ii.value === jj.value),
         filter(ii => ii.value === 'Paused')
     );
 
 
 async function listen(){
     let obj = await bus.getProxyObject('org.mpris.MediaPlayer2.spotify', '/org/mpris/MediaPlayer2');
-    console.log(obj)
     let properties = obj.getInterface('org.freedesktop.DBus.Properties');
     let metadata = await properties.Get('org.mpris.MediaPlayer2.Player', 'Metadata');
     metadataObs.next(metadata);

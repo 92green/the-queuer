@@ -18,6 +18,9 @@ queueFinished.subscribe(ii => {
     if(users.length > 0){
         let currentUser = users[mapItr % users.length];
         let selectedUri = userQueue.get(currentUser).shift();
+        if (userQueue.get(currentUser).length === 0){
+            userQueue.delete(currentUser)
+        }
         mapItr++;
         openUri(selectedUri.uri)
     } else {
@@ -28,9 +31,10 @@ queueFinished.subscribe(ii => {
 // Add items into the playlist 
 playlistSub.subscribe(({userId, item}) => {
     if(!userQueue.has(userId)){
-        userQueue.set(userId, [])
+        userQueue.set(userId, [item])
+    } else {
+        userQueue.get(userId).push(item)
     }
-    userQueue.get(userId).push(item)
 })
 
 const wss = new WebSocket.Server({
