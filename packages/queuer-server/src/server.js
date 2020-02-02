@@ -3,7 +3,7 @@ const {currentTrackObs, search} = require ('./spotify')
 const {Subject} = require('rxjs')
 const {share} = require('rxjs/operators')
 
-const userPlaylist = new Map();
+const userQueue = new Map();
 const playlistSub = new Subject().pipe(share());
 var currentSong = {};
 
@@ -14,10 +14,10 @@ currentTrackObs.subscribe(ii => {
 
 // Add items into the playlist 
 playlistSub.subscribe(({userId, item}) => {
-    if(!userPlaylist.has(userId)){
-        userPlaylist.set(userId, [])
+    if(!userQueue.has(userId)){
+        userQueue.set(userId, [])
     }
-    userPlaylist.get(userId).push(item)
+    userQueue.get(userId).push(item)
 })
 
 const wss = new WebSocket.Server({
@@ -27,7 +27,9 @@ const responders = {
     'SUBSCRIBE_CURRENT_TRACK': subscribeCurrentTrack,
     'SEARCH_ALBUM': searchAlbum,
     'SEARCH_TRACK': searchTrack,
-    'SEARCH_PLAYLIST': searchPlaylist
+    'SEARCH_PLAYLIST': searchPlaylist,
+    'SUBSCRIBE_USER_QUEUE': subscribeUserQueue,
+    'ADD_USER_QUEUE': addToUserQueue
 }
 
 const SUBSCRIPTION = {
@@ -45,7 +47,6 @@ wss.on('connection', (ws) => {
     });
 });
 
-
 function subscribeCurrentTrack(ws, {id}){
     ws.send(JSON.stringify({
         type: 'SUBSCRIBE_CURRENT_TRACK_RESPONSE',
@@ -62,23 +63,23 @@ function subscribeCurrentTrack(ws, {id}){
     })
 }
 
-async function addToPlaylist(ws, {id, userId}){
+async function addToUserQueue(ws, {id, userId, item}){
     playlistSub.next({userId, item});
 }
 
-function subscribeUserPlaylist(ws, {id, userId}){
-    if(userPlaylist.has(userId)){
+function subscribeUserQueue(ws, {id, userId}){
+    if(userQueue.has(userId)){
         ws.send(JSON.stringify({
-            type: 'USER_PLAYLIST_RESPONSE',
+            type: 'USER_QUEUE_RESPONSE',
             id,
-            data: userPlaylist.get(userId)
+            data: userQueue.get(userId)
         }))
     }
     playlistSub
         .pipe(filter(ii => ii.userId === userId))
         .subscribe(({item}) => {
             ws.send(JSON.stringify({
-                type: 'USER_PLAYLIST_UPDATE',
+                type: 'USER_QUEUE_UPDATE',
                 id,
                 data: item
             }))

@@ -89,7 +89,11 @@ button {
   padding: 0.6rem 1.2rem;
   margin: 0.5rem;
 }
-input{
+button:disabled {
+  background: #dddddd;
+}
+
+input {
   border: none;
   background-color: var(--hero);
   padding:  0.5rem 2%;
@@ -120,20 +124,21 @@ input{
   justify-items: left;
   text-align: left;
   padding: 0.5em 0.1em;
-  font-size: 0.5em;
+  font-size: 0.8em;
   padding: 1em;
-
+  position: absolute;
 }
 .currentTrack div  {
   display: flex;
   justify-content: center;
   align-items: center;
   justify-content: center;
-  /* padding: 0.5em; */
+  animation: scroll 7s linear 0s infinite;
 }
+
 .currentTrack img {
-  width: 5em;
-  height: 5em;
+  width: 2.5em;
+  height: 2.5em;
 }
 
 @keyframes spin {

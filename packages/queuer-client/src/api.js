@@ -8,6 +8,31 @@ import {distinctUntilChanged, debounceTime} from 'rxjs/operators'
 const subject = webSocket("ws://localhost:8080");
 
 
+export function subscribeToUserQueue({userId}){
+    const id = uuidv4();
+    return subject.pipe(
+        share(),
+        doOnSubscribe(() =>  {
+            subject.next({
+                type: 'SUBSCRIBE_USER_QUEUE',
+                id,
+                userId
+            })
+        }),
+        filter(ii => ii.id === id)
+    )
+}
+
+export function addToUserQueue({userId, item}){
+    const id = uuidv4();
+    return subject.next({
+        type: 'ADD_USER_QUEUE',
+        id,
+        userId,
+        item
+    });
+}
+
 export function subscribeToTrackChange(){
     const id = uuidv4();
     
@@ -19,8 +44,7 @@ export function subscribeToTrackChange(){
                 id
             })
         }),
-        filter(ii => ii.id === id),
-        tap(ii => console.log('Current Track', ii))
+        filter(ii => ii.id === id)
     )
 }
 
@@ -38,7 +62,7 @@ export function SearchAlbumSub(){
                 query
             });
             return subject.pipe(
-                filter(ii => ii.id === id),
+                filter(ii => ii.id === id && ii.data && ii.data.albums),
                 map(ii => ii.data)
             )
         }),
