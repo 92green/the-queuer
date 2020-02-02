@@ -56,15 +56,14 @@ body{
 }
 
 .Album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
   height: 100%;
   font-size: 0.6em;
-  display: grid;
-  /* padding: 0.25em; */
+  padding: 0.25em;
   border-top: 1px black;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  height: 4em;
   justify-items: center;
-  align-items: center;
+  align-items: center; 
   width: 100%;
 }
 .Album-art{
@@ -116,6 +115,17 @@ input {
   
 }
 
+.content{
+  display: grid;
+  /* align-items: center; */
+  /* display: inline-block; */
+}
+
+.sizeDiv {
+  display: grid;
+  height: 100%
+}
+
 .currentTrack{
   display: grid;
   /* grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); */
@@ -132,7 +142,6 @@ input {
   display: flex;
   justify-content: center;
   align-items: center;
-  justify-content: center;
   animation: scroll 7s linear 0s infinite;
 }
 
