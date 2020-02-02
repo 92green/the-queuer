@@ -132,12 +132,12 @@ input {
   font-size: 0.8em;
   /* padding: 1em; */
   position: absolute;
-  
 }
 .currentTrack div  {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding:0.1em;
 }
 
 h2 {
