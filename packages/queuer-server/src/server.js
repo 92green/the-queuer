@@ -3,15 +3,18 @@ const {currentTrackObs, search, queueFinished, openUri} = require ('./spotify')
 const {Subject} = require('rxjs')
 const {share, filter} = require('rxjs/operators')
 
-
-
 const userQueue = new Map();
 const userQueueSub = new Subject().pipe(share());
 var currentSong = {};
+const ERROR_NO_CONNECTION = "Unable to connect to librespot-java, check that it's installed and running"
 
 currentTrackObs.subscribe(ii => {
     delete(ii.length);
     currentSong = ii;
+},
+(err) => {
+    console.error(ERROR_NO_CONNECTION);
+    process.exit(-1)
 })
 
 let mapItr = 0;
@@ -30,6 +33,10 @@ queueFinished.subscribe(ii => {
     } else {
         console.log('Nothing to play')
     }
+},
+(err) => {
+    console.error(ERROR_NO_CONNECTION);
+    process.exit(-1)
 })
 
 // Add items into the playlist 
