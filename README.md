@@ -10,7 +10,7 @@ The Queuer allows individuals to create a custom album queue, the server will th
 
 ## Setup.
 
-The application uses [librespot-java](https://www.google.com) as a backend
+The application uses [librespot-java](https://github.com/librespot-org/librespot-java/) as a backend
 
 ### Download librespot-java and configure
 
