@@ -3,9 +3,6 @@ global.WebSocket = require('ws');
 const {Subject, interval} = require('rxjs');
 const {webSocket} = require('rxjs/webSocket');
 const {share, map, distinctUntilChanged, filter, tap, withLatestFrom, startWith} = require('rxjs/operators');
-const Spotify = require('node-spotify-api');
-const SpotifyWebApi = require('spotify-web-api-node')
-const spotifyWebApi = new SpotifyWebApi({})
 const fetch = require('node-fetch');
 
 const LIBRESPOT_LOCATION = "localhost:24879";
