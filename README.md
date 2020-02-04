@@ -10,9 +10,43 @@ The Queuer allows individuals to create a custom album queue, the server will th
 
 ## Setup.
 
-Currently the application only runs on linux with spotify installed, It uses DBUS to connect to spotify and _should_ also work with spotifyd, although this is yet to be tested.
+The application uses [librespot-java](https://www.google.com) as a backend
 
-## Environment Vars
+### Download librespot-java and configure
 
-* `SPOTIFY_CLIENT_ID` client id from https://developer.spotify.com/dashboard
-* `SPOTIFY_CLIENT_SECRET` client secret from https://developer.spotify.com/dashboard
+Edit `config.toml` (configiration file created when you first run librespot-java)
+
+Make certain that autoplay is set to false.
+
+```
+autoplayEnabled = false
+```
+
+currently I have only tested this application using USER_PASS authentication, although it may work using the other options.
+
+To setup this authentication method set the following in the `config.toml`
+
+```
+strategy = "USER_PASS"
+username = "YourSpotifyUsername"
+password = "YourSpotifyPassword"
+```
+
+### Run the client.
+
+The client can be run using `yarn start` (or `npm run start`) from within ``packages/queuer-client` from the client directory, or alternativly built and deployed using `serv` or another http server (nginx perhaps)
+
+```
+cd packages/client
+yarn
+yarn start
+
+```
+
+### Run the server
+
+```
+cd packages/queuer-server
+yarn
+node src/server.js
+```
