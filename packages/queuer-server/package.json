@@ -6,13 +6,9 @@
   "author": "Paul Esson",
   "license": "MIT",
   "dependencies": {
-    "dbus-next": "^0.8.1",
-    "express": "^4.17.1",
     "node-fetch": "^2.6.0",
-    "node-spotify-api": "^1.1.1",
     "request": "^2.88.0",
     "rxjs": "^6.5.4",
-    "spotify-web-api-node": "^4.0.0",
     "sqlite3": "^4.1.1",
     "ws": "^7.2.1"
   }
