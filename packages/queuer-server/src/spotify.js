@@ -8,6 +8,11 @@ const fetch = require('node-fetch');
 const LIBRESPOT_LOCATION = "localhost:24879";
 
 const respotEvents = webSocket(`ws://${LIBRESPOT_LOCATION}/events`).pipe(share());
+
+// respotEvents.subscribe(() => {}, (err) => {
+//     console.error(ERROR_NO_CONNECTION);
+// })
+
 const currentTrackObs = respotEvents.pipe(
     filter(ii => ii.event === 'metadataAvailable'),
     map(({track}) => {
@@ -16,7 +21,6 @@ const currentTrackObs = respotEvents.pipe(
             let art = track.album.coverGroup.image.sort((ii, jj) => ii.height < jj.height)[0];
             artUrl = `https://i.scdn.co/image/${art.fileId.toLowerCase()}`
         }
-        console.log('artURL', artUrl)
         return {
             artUrl,
             trackid: track.gid,
@@ -41,10 +45,6 @@ let requestItemTick =
         share()
     );
 
-
-
-requestItemTick
-    .subscribe(ii => console.log(ii))
 
 async function openUri (spotifyUri) {
     return fetch(`http://${LIBRESPOT_LOCATION}/player/load`, { method: 'POST', body: `uri=${spotifyUri}&play=true` })
