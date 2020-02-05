@@ -1,6 +1,7 @@
 import React from 'react';
 import useCurrentTrack from './useCurrentTrack'
 import useAlbumSearch from './useAlbumSearch'
+import useTrackSearch from './useTrackSearch'
 import useViewer from './useViewer'; 
 import {useState} from 'react';
 import Img from 'react-image'
@@ -34,6 +35,31 @@ function CurrentTrack() {
   }
 }
 
+
+function ItemDisplayFactory({item, isAdded = false}){
+    return item.uri.includes("album") ? <AlbumDisplay album={item} isAdded={isAdded}/> : <TrackDisplay track={item} isAdded={isAdded}/>
+}
+
+function TrackDisplay({track, isAdded = false}){
+  let {viewer} = useViewer()
+  const onAdd = () => {
+    addToUserQueue({userId: viewer.id, item: track});
+  }
+  const onRemove = () => {
+    removeFromUserQueue({userId: viewer.id, item: track});
+  }
+  return (
+    <div className="Album-display" key={track.id}>
+      <Img src={track.album.images.map(ii => ii.url)} decode={false} loader={<Loader/>}  className="Album-art"/>
+      <div>{track.name}</div>
+      <div className="Album-artists">{track.artists.map(({name}) => name).join(' & ')}</div>
+      <div>{track.album.name}</div>
+      {isAdded ? <button type="button" onClick={onRemove} className="btn-red">Remove</button> : <button type="button" onClick={onAdd}>Add</button>}
+    </div>
+  );
+}
+
+
 function AlbumDisplay({album, isAdded = false}){
   let {viewer} = useViewer()
   const onAdd = () => {
@@ -59,7 +85,7 @@ function UserQueue() {
   return <div>
     <h2>My Queue</h2>
     <div className="Album-grid">
-        {userQueue.map(ii => <AlbumDisplay album={ii} isAdded={true}/>)}
+        {userQueue.map(ii => <ItemDisplayFactory item={ii} isAdded={true}/>)}
     </div>
   </div>
 }
@@ -88,6 +114,38 @@ function AlbumSearch() {
   )
 }
 
+
+
+function TrackSearch() {
+  const {setSearchTerm, searchResults, searchTerm} = useTrackSearch();
+  const {viewer} = useViewer();
+  let {userQueue} = useUserQueue({userId: viewer.id});
+  const onQueryChange = (event) => {
+    setSearchTerm(event.target.value)
+  }
+  console.log(userQueue.map(jj => jj.id))
+  return (
+    <div>
+      <input type="text" value={searchTerm} onChange={onQueryChange} placeholder="Search Tracks"/>
+      
+      {
+        searchResults && searchResults.length > 0 ?
+        <div>
+          <div className="Album-grid">
+            {searchResults.map(ii => <TrackDisplay track={ii} isAdded={userQueue.map(jj => jj.id).includes(ii.id)}/>)}
+          </div>
+          <pre>
+            {JSON.stringify(searchResults, null, 3)}
+          </pre>
+          
+        </div>
+        :
+        <div></div>
+      }
+    </div>
+  )
+}
+
 function App() {
   const {currentTrack} = useCurrentTrack()
   return (
@@ -98,12 +156,16 @@ function App() {
         </header>
         <div className="menu">
           <Link to="/">Queue</Link>
-          <Link to="/search">Search</Link>
+          <Link to="/searchAlbum">Search Albums</Link>
+          <Link to="/searchTrack">Search Tracks</Link>
         </div>
         <div className="content"> 
           <Switch>
-            <Route path="/search">
+            <Route path="/searchAlbum">
               <AlbumSearch />
+            </Route>
+            <Route path="/searchTrack">
+              <TrackSearch />
             </Route>
             <Route path="/">
               <UserQueue/>
