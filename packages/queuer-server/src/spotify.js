@@ -9,13 +9,9 @@ const LIBRESPOT_LOCATION = "localhost:24879";
 
 const respotEvents = webSocket(`ws://${LIBRESPOT_LOCATION}/events`).pipe(share());
 
-// respotEvents.subscribe(() => {}, (err) => {
-//     console.error(ERROR_NO_CONNECTION);
-// })
-
 const currentTrackObs = respotEvents.pipe(
     filter(ii => ii.event === 'metadataAvailable'),
-    map(({track}) => {
+    map(({track, ...rest}) => {
         let artUrl = "";
         if(track.album && track.album.coverGroup && track.album.coverGroup.image){
             let art = track.album.coverGroup.image.sort((ii, jj) => ii.height < jj.height)[0];
@@ -27,7 +23,8 @@ const currentTrackObs = respotEvents.pipe(
             album: track.album.name,
             artist: track.artist.map(ii => ii.name),
             title: track.name,
-            trackNumber: track.number
+            trackNumber: track.number,
+            duration_ms: track.duration
         }
     }),
     distinctUntilChanged((ii, jj) => ii.trackid === jj.trackid)
@@ -39,7 +36,7 @@ let startStopStatus = respotEvents
         filter(({event}) => event === 'playbackPaused' || event === 'playbackResumed')
     );
 let requestItemTick = 
-    interval(200).pipe(
+    interval(3000).pipe(
         withLatestFrom(startStopStatus, (ii, jj) => jj),
         filter((ii) => ii.event === 'playbackPaused'),
         share()
