@@ -35,13 +35,18 @@ const currentTrackObs = respotEvents.pipe(
     distinctUntilChanged((ii, jj) => ii.trackid === jj.trackid)
 )
 
-let startStopStatus = respotEvents
-    .pipe(
-        startWith(() => ({event: 'playbackPaused'})),
-        filter(({event}) => event === 'playbackPaused' || event === 'playbackResumed')
-    );
+
+
+let startStopStatus = 
+    merge(defer(() => of({event: 'playbackPaused'})), 
+    respotEvents
+        .pipe(
+            tap(ii => console.log(ii)),
+            filter(({event}) => event === 'playbackPaused' || event === 'playbackResumed')
+        )
+    )
 let requestItemTick = 
-    interval(200).pipe(
+    interval(2000).pipe(
         withLatestFrom(startStopStatus, (ii, jj) => jj),
         filter((ii) => ii.event === 'playbackPaused'),
         share()
