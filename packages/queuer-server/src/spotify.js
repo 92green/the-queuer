@@ -3,26 +3,24 @@ global.WebSocket = require('ws');
 const {Subject, interval, defer, merge, of} = require('rxjs');
 const {webSocket} = require('rxjs/webSocket');
 const {share, map, distinctUntilChanged, filter, tap, withLatestFrom, startWith} = require('rxjs/operators');
-const Spotify = require('node-spotify-api');
-const SpotifyWebApi = require('spotify-web-api-node')
-const spotifyWebApi = new SpotifyWebApi({})
 const fetch = require('node-fetch');
 
 const LIBRESPOT_LOCATION = "localhost:24879";
 
 const respotEvents = webSocket(`ws://${LIBRESPOT_LOCATION}/events`).pipe(share());
+
+// respotEvents.subscribe(() => {}, (err) => {
+//     console.error(ERROR_NO_CONNECTION);
+// })
+
 const currentTrackObs = respotEvents.pipe(
     filter(ii => ii.event === 'metadataAvailable'),
-    tap(ii => {
-        console.log(JSON.stringify(ii))
-    }),
     map(({track}) => {
         let artUrl = "";
         if(track.album && track.album.coverGroup && track.album.coverGroup.image){
             let art = track.album.coverGroup.image.sort((ii, jj) => ii.height < jj.height)[0];
             artUrl = `https://i.scdn.co/image/${art.fileId.toLowerCase()}`
         }
-        console.log('artURL', artUrl)
         return {
             artUrl,
             trackid: track.gid,
@@ -53,38 +51,28 @@ let requestItemTick =
     );
 
 
-
-requestItemTick
-    .subscribe(ii => console.log(ii))
-
 async function openUri (spotifyUri) {
     return fetch(`http://${LIBRESPOT_LOCATION}/player/load`, { method: 'POST', body: `uri=${spotifyUri}&play=true` })
 }
 
 async function getToken({scope}){
-    let tokenRes = await fetch(`http://${LIBRESPOT_LOCATION}/token/${scope}`, { method: 'POST' })
-    let tokenJson =  await tokenRes.json()
+    let tokenRes = await fetch(`http://${LIBRESPOT_LOCATION}/token/${scope}`, { method: 'POST' });
+    let tokenJson = await tokenRes.json();
     return tokenJson.token;
-
 }
 
 async function search({type, query}){
-    try{ 
-        let token = await getToken({scope: 'user-read-private'})
-        let serachUrl = new URL('https://api.spotify.com/v1/search')
-        serachUrl.searchParams.append('q', query)
-        serachUrl.searchParams.append('type', type)
-        serachUrl.searchParams.append('market', 'from_token')
-        let res = await fetch(serachUrl.href, {
-            headers:  {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        let json = await res.json()
-        return json
-    } catch (ee){
-        console.error(ee)
-    }
+    let token = await getToken({scope: 'user-read-private'});
+    let serachUrl = new URL('https://api.spotify.com/v1/search');
+    serachUrl.searchParams.append('q', query);
+    serachUrl.searchParams.append('type', type);
+    serachUrl.searchParams.append('market', 'from_token');
+    let res = await fetch(serachUrl.href, {
+        headers:  {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    return await res.json()
 }
 
 module.exports = {
