@@ -1,10 +1,27 @@
 const WebSocket = require('ws');
 const {currentTrackObs, search, queueFinished, openUri} = require ('./spotify')
-const {Subject} = require('rxjs')
-const {share, filter} = require('rxjs/operators')
-
+const {Subject} = require('rxjs');
+const {share, filter, withLatestFrom, tap} = require('rxjs/operators');
+const PouchDB = require('pouchdb-node');
+PouchDB.plugin(require('pouchdb-find'));
+const {subDays} = require('date-fns');
+const userQueueDb = new PouchDB('userQueue');
+const userPlayedDb = new PouchDB('userPlayed');
+const uuid = require('uuid/v4');
+userQueueDb.createIndex({
+    index: {
+      fields: ['items']
+    }
+});
+userPlayedDb.createIndex({
+    index: {
+      fields: ['date']
+    }
+});
 const userQueue = new Map();
 const userQueueSub = new Subject().pipe(share());
+const currentPlayingUserSub = new Subject().pipe(share());
+
 var currentSong = {};
 const ERROR_NO_CONNECTION = "Unable to connect to librespot-java, check that it's installed and running"
 
@@ -16,22 +33,49 @@ currentTrackObs.subscribe(ii => {
     console.error(ERROR_NO_CONNECTION);
     process.exit(-1)
 })
-
-let mapItr = 0;
-queueFinished.subscribe(ii => {
-    let users = Array.from(userQueue.keys());
-    if(users.length > 0){
-        let userId = users[mapItr % users.length];
-        let [item] = userQueue.get(userId);
-        userQueueSub.next({
-            userId,
-            action: 'REMOVE',
-            item
-        })
-        mapItr++;
-        openUri(item.uri)
-    } else {
-        console.log('Nothing to play')
+queueFinished.subscribe(async (ii) => {
+    try {
+        let window = subDays(new Date(), 7);
+        let played = await userPlayedDb.find({
+            selector: {date: {$gt: window.toISOString()}}
+        });
+        let userPlaytimes = played.docs.reduce((rr, ii) => {
+            let current = 0
+            if(rr.has(ii.userId)){
+                current = rr.get(ii.userId);
+            }
+            current += ii.track.duration_ms
+            rr.set(ii.userId, current)
+            return rr;
+        }, new Map())
+        let userQueues = await userQueueDb.find({
+            selector: {'items.0': { $exists : true}}
+        });
+        if(userQueues.docs.length > 0){
+            let [{_id: userId, items}] = userQueues.docs.sort((ii, jj) => {
+                if(userPlaytimes.has(ii.userId)) {
+                    return true;
+                }
+                if(userPlaytimes.has(jj.userId)) {
+                    return false;
+                }
+                userPlaytimes.get(ii.userId) < userPlaytimes.get(jj.userId)
+            })
+            let [item] = items;
+            userQueueSub.next({
+                userId,
+                action: 'REMOVE',
+                item
+            })
+            currentPlayingUserSub.next({
+                userId
+            });
+            openUri(item.uri)
+        } else {
+            console.log('Nothing to play')
+        }
+    } catch (ee){
+        console.error(ee);
     }
 },
 (err) => {
@@ -41,24 +85,35 @@ queueFinished.subscribe(ii => {
 
 // Add items into the playlist 
 // Currently responsable to manage the data storage of the list.
-userQueueSub.subscribe(({userId, item, action}) => {
+userQueueSub.subscribe(async ({userId, item, action}) => {
     switch(action) {
         case 'ADD':
-            if(!userQueue.has(userId)){
-                userQueue.set(userId, [item])
-            } else {
-                userQueue.get(userId).push(item)
+            try{
+                let doc = await userQueueDb.get(userId)
+                var response = await userQueueDb.put({
+                    _id: userId,
+                    _rev: doc._rev,
+                    items: [...doc.items, item]
+                });
+            } catch (ee){
+                if(ee.status === 404){
+                    await userQueueDb.put({
+                        _id: userId,
+                        items: [item]
+                    });
+                } else {
+                    throw ee;
+                }
             }
         break;
         case 'REMOVE':
-            if(userQueue.has(userId)){
-                let updated = userQueue.get(userId).filter(ii => ii.uri !== item.uri);
-                if(updated.length === 0){
-                    userQueue.delete(userId)
-                } else {
-                    userQueue.set(userId, updated)
-                }
-            }
+            let doc = await userQueueDb.get(userId)
+            let updated = doc.items.filter(ii => ii.uri !== item.uri);
+            var response = await userQueueDb.put({
+                _id: userId,
+                _rev: doc._rev,
+                items: updated
+            });
         break;
     }
 })
@@ -107,6 +162,22 @@ function subscribeCurrentTrack(ws, {id}){
     })
 }
 
+// Update previous played tracks with the user who played them.
+currentTrackObs.pipe(
+    withLatestFrom(currentPlayingUserSub)
+).subscribe(async ([track, userId]) => {
+    try {
+        await userPlayedDb.put({
+            _id: uuid(),
+            track,
+            userId,
+            date: new Date().toISOString()
+        });
+    } catch (ee){
+        console.error(ee)
+    }
+})
+
 async function addToUserQueue(ws, {id, userId, item}){
     userQueueSub.next({
         userId, 
@@ -123,13 +194,18 @@ async function removeFromUserQueue(ws, {id, userId, item}){
     })
 }
 
-function subscribeUserQueue(ws, {id, userId}){
-    if(userQueue.has(userId)){
+async function subscribeUserQueue(ws, {id, userId}){
+    try{
+        let doc = await userQueueDb.get(userId)
         ws.send(JSON.stringify({
             type: 'USER_QUEUE_RESPONSE',
             id,
-            data: userQueue.get(userId)
+            data: doc.items
         }))
+    } catch (ee){
+        if(ee.status !== 404){
+            throw ee;
+        }
     }
     userQueueSub
         .pipe(filter(ii => ii.userId === userId))

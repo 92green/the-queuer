@@ -82,6 +82,28 @@ export function SearchAlbumSub(){
     );
 } 
 
+export function SearchTrackSub(){
+    const searchAlbumSubject = new Subject();
+    const id = uuidv4();
+
+    return searchAlbumSubject.pipe(
+        distinctUntilChanged(),
+        debounceTime(20),
+        flatMap((query) => {
+            subject.next({
+                type: 'SEARCH_TRACK',
+                id,
+                query
+            });
+            return subject.pipe(
+                filter(ii => ii.id === id && ii.data && ii.data.tracks),
+                map(ii => ii.data)
+            )
+        }),
+        share(),
+    );
+} 
+
 function doOnSubscribe<T>(onSubscribe: () => void): (source: Observable<T>) =>  Observable<T> {
     return function inner(source: Observable<T>): Observable<T> {
         return defer(() => {

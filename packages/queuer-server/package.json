@@ -6,7 +6,10 @@
   "author": "Paul Esson",
   "license": "MIT",
   "dependencies": {
+    "date-fns": "^2.9.0",
     "node-fetch": "^2.6.0",
+    "pouchdb-find": "^7.1.1",
+    "pouchdb-node": "^7.1.1",
     "request": "^2.88.0",
     "rxjs": "^6.5.4",
     "sqlite3": "^4.1.1",
