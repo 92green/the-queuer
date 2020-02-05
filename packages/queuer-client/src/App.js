@@ -81,12 +81,31 @@ function AlbumDisplay({album, isAdded = false}){
 function UserQueue() {
   const {viewer} = useViewer();
   let {userQueue} = useUserQueue({userId: viewer.id});
-  // console.log('viewer queue', viewerQueue)
+  let albums = userQueue.filter(ii=> ii.uri.includes('album'))
+  let tracks = userQueue.filter(ii=> ii.uri.includes('track'))
   return <div>
     <h2>My Queue</h2>
-    <div className="Album-grid">
-        {userQueue.map(ii => <ItemDisplayFactory item={ii} isAdded={true}/>)}
-    </div>
+    { userQueue.length > 0 ?
+        <div className="Queue-grid">
+          { albums.length > 0 ? 
+            <div>
+              <h3>Albums</h3>
+              <div className="Album-grid"> 
+                {albums.map(ii => <ItemDisplayFactory item={ii} isAdded={true}/>)} 
+              </div> 
+          </div> : <div/> }
+          { tracks.length > 0 ? 
+            <div>
+              <h3>Tracks</h3>
+              <div className="Album-grid"> 
+                {tracks.map(ii => <ItemDisplayFactory item={ii} isAdded={true}/>)} 
+              </div> 
+          </div> : <div/> }
+        </div> :
+        <div>
+          Nothing added <Link to="/searchAlbum">Search Albums</Link> or <Link to="/searchTrack">Search Tracks</Link> to populate your queue with you favorite tunes
+        </div>
+    }
   </div>
 }
 
@@ -100,8 +119,9 @@ function AlbumSearch() {
   console.log(userQueue.map(jj => jj.id))
   return (
     <div>
-      <input type="text" value={searchTerm} onChange={onQueryChange} placeholder="Search Albums"/>
       
+      <input type="text" value={searchTerm} onChange={onQueryChange} placeholder="Search Albums"/>
+      <h2>Albums</h2>
       {
         searchResults && searchResults.length > 0 ?
         <div className="Album-grid">
@@ -127,17 +147,13 @@ function TrackSearch() {
   return (
     <div>
       <input type="text" value={searchTerm} onChange={onQueryChange} placeholder="Search Tracks"/>
-      
+      <h2>Tracks</h2>
       {
         searchResults && searchResults.length > 0 ?
         <div>
           <div className="Album-grid">
             {searchResults.map(ii => <TrackDisplay track={ii} isAdded={userQueue.map(jj => jj.id).includes(ii.id)}/>)}
           </div>
-          <pre>
-            {JSON.stringify(searchResults, null, 3)}
-          </pre>
-          
         </div>
         :
         <div></div>

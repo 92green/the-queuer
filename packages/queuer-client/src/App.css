@@ -58,6 +58,14 @@ body{
   }
 }
 
+.Queue-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-items: normal;
+  align-items: baseline;
+  padding: 0.5em;
+}
+
 .Album-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
@@ -158,7 +166,12 @@ h2 {
 .menu a {
   padding: 0.5em;
   display: inline;
+  color: var(--color5);
+  text-decoration-style: none;
   /* border-right: solid 2px black; */
+}
+.menu a:hover {
+  background-color: #aaa;
 }
 
 .currentTrack img {
