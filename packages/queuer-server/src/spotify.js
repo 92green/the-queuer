@@ -1,6 +1,6 @@
 global.WebSocket = require('ws');
 
-const {Subject, interval} = require('rxjs');
+const {Subject, interval, defer, merge, of} = require('rxjs');
 const {webSocket} = require('rxjs/webSocket');
 const {share, map, distinctUntilChanged, filter, tap, withLatestFrom, startWith} = require('rxjs/operators');
 const Spotify = require('node-spotify-api');
