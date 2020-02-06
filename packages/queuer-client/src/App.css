@@ -77,6 +77,16 @@ body{
   align-items: center; 
   width: 98%;
 }
+
+.Album-display .Album-art{
+  /* box-shadow: 3px 3px 1px rgba(200, 200, 200, 0.5),  6px 6px 1px rgba(200, 200, 200, 0.5),  9px 9px 1px rgba(200, 200, 200, 0.5); */
+  
+  box-shadow: 1px 1px 1px white, 2px 2px 1px white, 3px 3px 1px rgba(200, 200, 200, 1), 4px 4px 1px white, 5px 5px 1px white, 6px 6px 1px rgba(200, 200, 200, 1), 7px 7px 1px white, 8px 8px 1px white, 9px 9px 1px rgba(200, 200, 200, 1);
+  position: relative;
+  top: -6px;
+  left: -6px;
+}
+
 .Album-art{
   border-width: 1px;
   border-color: rgba(200, 200, 200, 0.3);
@@ -125,8 +135,13 @@ input {
   text-align: center;
   width: 15rem;
   height: 18rem;
-  padding: 1em;
-  
+  padding: 1em; 
+}
+.Track-display {
+  text-align: center;
+  width: 15rem;
+  height: 18rem;
+  padding: 1em; 
 }
 
 .currentTrack{
