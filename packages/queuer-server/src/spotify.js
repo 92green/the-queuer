@@ -1,6 +1,6 @@
 global.WebSocket = require('ws');
 
-const {Subject, interval, defer} = require('rxjs');
+const {Subject, interval, defer, of, merge} = require('rxjs');
 const {webSocket} = require('rxjs/webSocket');
 const {share, map, distinctUntilChanged, filter, tap, withLatestFrom, startWith} = require('rxjs/operators');
 const fetch = require('node-fetch');
@@ -31,19 +31,19 @@ const currentTrackObs = respotEvents.pipe(
     distinctUntilChanged((ii, jj) => ii.trackid === jj.trackid)
 )
 
-let startStopStatus = respotEvents
-    .pipe(
-        startWith(() => ({event: 'playbackPaused'})),
-        filter(({event}) => event === 'playbackPaused' || event === 'playbackResumed')
-    );
+let startStopStatus = 
+    merge(defer(() => of({event: 'playbackPaused'})), 
+    respotEvents
+        .pipe(
+            filter(({event}) => event === 'playbackPaused' || event === 'playbackResumed')
+        )
+    )
 let requestItemTick = 
     interval(3000).pipe(
         withLatestFrom(startStopStatus, (ii, jj) => jj),
         filter((ii) => ii.event === 'playbackPaused'),
-        // tap(ii => console.log(ii)),
         share()
     );
-
 
 async function openUri (spotifyUri) {
     return fetch(`http://${LIBRESPOT_LOCATION}/player/load`, { method: 'POST', body: `uri=${spotifyUri}&play=true` })
