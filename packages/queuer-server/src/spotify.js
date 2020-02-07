@@ -1,6 +1,6 @@
 global.WebSocket = require('ws');
 
-const {Subject, interval} = require('rxjs');
+const {Subject, interval, defer} = require('rxjs');
 const {webSocket} = require('rxjs/webSocket');
 const {share, map, distinctUntilChanged, filter, tap, withLatestFrom, startWith} = require('rxjs/operators');
 const fetch = require('node-fetch');
@@ -40,6 +40,7 @@ let requestItemTick =
     interval(3000).pipe(
         withLatestFrom(startStopStatus, (ii, jj) => jj),
         filter((ii) => ii.event === 'playbackPaused'),
+        // tap(ii => console.log(ii)),
         share()
     );
 

@@ -7,7 +7,7 @@ export default function useAlbumSearch() {
     const [searchResults, setSearchResults] = useState([]);
     useEffect(() => {
         searchAlbumSub.next(searchTerm);
-    })
+    }, [searchTerm])
     searchAlbumSub.subscribe(({albums}) => {
         setSearchResults(albums.items);
     })
