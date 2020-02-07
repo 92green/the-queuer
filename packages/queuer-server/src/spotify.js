@@ -1,6 +1,6 @@
 global.WebSocket = require('ws');
 
-const {Subject, interval} = require('rxjs');
+const {Subject, interval, defer, of, merge} = require('rxjs');
 const {webSocket} = require('rxjs/webSocket');
 const {share, map, distinctUntilChanged, filter, tap, withLatestFrom, startWith} = require('rxjs/operators');
 const fetch = require('node-fetch');
@@ -9,9 +9,10 @@ const LIBRESPOT_LOCATION = "localhost:24879";
 
 const respotEvents = webSocket(`ws://${LIBRESPOT_LOCATION}/events`).pipe(share());
 
+
 const currentTrackObs = respotEvents.pipe(
     filter(ii => ii.event === 'metadataAvailable'),
-    map(({track, ...rest}) => {
+    map(({track}) => {
         let artUrl = "";
         if(track.album && track.album.coverGroup && track.album.coverGroup.image){
             let art = track.album.coverGroup.image.sort((ii, jj) => ii.height < jj.height)[0];
@@ -30,18 +31,19 @@ const currentTrackObs = respotEvents.pipe(
     distinctUntilChanged((ii, jj) => ii.trackid === jj.trackid)
 )
 
-let startStopStatus = respotEvents
-    .pipe(
-        startWith(() => ({event: 'playbackPaused'})),
-        filter(({event}) => event === 'playbackPaused' || event === 'playbackResumed')
-    );
+let startStopStatus = 
+    merge(defer(() => of({event: 'playbackPaused'})), 
+    respotEvents
+        .pipe(
+            filter(({event}) => event === 'playbackPaused' || event === 'playbackResumed')
+        )
+    )
 let requestItemTick = 
     interval(3000).pipe(
         withLatestFrom(startStopStatus, (ii, jj) => jj),
         filter((ii) => ii.event === 'playbackPaused'),
         share()
     );
-
 
 async function openUri (spotifyUri) {
     return fetch(`http://${LIBRESPOT_LOCATION}/player/load`, { method: 'POST', body: `uri=${spotifyUri}&play=true` })

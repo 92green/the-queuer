@@ -49,7 +49,7 @@ function TrackDisplay({track, isAdded = false}){
     removeFromUserQueue({userId: viewer.id, item: track});
   }
   return (
-    <div className="Album-display" key={track.id}>
+    <div className="Track-display" key={track.id}>
       <Img src={track.album.images.map(ii => ii.url)} decode={false} loader={<Loader/>}  className="Album-art"/>
       <div>{track.name}</div>
       <div className="Album-artists">{track.artists.map(({name}) => name).join(' & ')}</div>
@@ -85,23 +85,11 @@ function UserQueue() {
   let tracks = userQueue.filter(ii=> ii.uri.includes('track'))
   return <div>
     <h2>My Queue</h2>
-    { userQueue.length > 0 ?
-        <div className="Queue-grid">
-          { albums.length > 0 ? 
-            <div>
-              <h3>Albums</h3>
-              <div className="Album-grid"> 
-                {albums.map(ii => <ItemDisplayFactory item={ii} isAdded={true}/>)} 
-              </div> 
-          </div> : <div/> }
-          { tracks.length > 0 ? 
-            <div>
-              <h3>Tracks</h3>
-              <div className="Album-grid"> 
-                {tracks.map(ii => <ItemDisplayFactory item={ii} isAdded={true}/>)} 
-              </div> 
-          </div> : <div/> }
-        </div> :
+    { userQueue.length > 0 ? 
+        <div className="Album-grid">
+          {userQueue.map(ii => <ItemDisplayFactory item={ii} isAdded={true}/>)}
+        </div>
+       :
         <div>
           Nothing added <Link to="/searchAlbum">Search Albums</Link> or <Link to="/searchTrack">Search Tracks</Link> to populate your queue with you favorite tunes
         </div>

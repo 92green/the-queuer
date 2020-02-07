@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {SearchAlbumSub} from './api'
+import {SearchTrackSub} from './api'
 
-const searchAlbumSub = SearchAlbumSub();
+const searchTrackSub = SearchTrackSub();
 export default function useAlbumSearch() {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     useEffect(() => {
-        searchAlbumSub.next(searchTerm);
+        searchTrackSub.next(searchTerm);
     }, [searchTerm])
-    searchAlbumSub.subscribe(({albums}) => {
-        setSearchResults(albums.items);
+    searchTrackSub.subscribe(({tracks}) => {
+        setSearchResults(tracks.items);
     })
     
     return {setSearchTerm, searchResults, searchTerm};
