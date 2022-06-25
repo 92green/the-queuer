@@ -7,7 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "date-fns": "^2.9.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.7",
     "pouchdb-find": "^7.1.1",
     "pouchdb-node": "^7.1.1",
     "request": "^2.88.0",
